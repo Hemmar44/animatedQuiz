@@ -1,17 +1,16 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <quiz-base></quiz-base>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import QuizBase from './components/QuizBase'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    QuizBase
   }
 }
 </script>
