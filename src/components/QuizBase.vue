@@ -39,7 +39,7 @@
                 this.mathematics();
             },
             mathematics() {
-                let equations = ['+', '-'];
+                let equations = ['+', '-', '*', '/'];
                 this.shuffleArray(equations);
                 switch (equations[0]) {
                     case '+':
@@ -47,8 +47,16 @@
                         this.generateAnswers();
                         break;
                     case '-':
-                       this.minus();
-                       this.generateAnswers();
+                        this.minus();
+                        this.generateAnswers();
+                        break;
+                    case '*':
+                        this.multiplication();
+                        this.generateAnswers();
+                        break;
+                    case '/':
+                        this.divide();
+                        this.generateAnswers()
                 }
             },
             sum() {
@@ -68,11 +76,37 @@
                 while ( this.answer <= 0 );
                 this.question =  first + ' - ' + second + ' ='
             },
+            multiplication() {
+                let first = Math.floor(Math.random() * 20);
+                let second = Math.floor(Math.random() * 20);
+                this.answer = first * second;
+                this.question =  first + ' * ' + second + ' ='
+            },
+            divide() {
+                let first = 0;
+                let second = 0;
+                do {
+                    first = Math.floor(Math.random() * 200) + 1;
+                    second = Math.floor(Math.random() * 200) + 2;
+                    this.answer = first / second;
+                }
+                while ( first % second !== 0 );
+                this.question =  first + ' / ' + second + ' ='
+            },
             generateAnswers() {
                 this.allAnswers.push(this.answer);
+                const possibilities = ['+', '-'];
+                this.shuffleArray(possibilities);
                 while (this.allAnswers.length < 4) {
-                    let wrongAnswer = Math.floor(Math.random() * 200);
-                    if (!this.allAnswers.includes(wrongAnswer)) {
+                    let wrongAnswer = 0;
+                    switch (possibilities[0]) {
+                        case '+':
+                            wrongAnswer = this.answer + Math.floor(Math.random() * 20);
+                            break;
+                        case '-':
+                            wrongAnswer = this.answer - Math.floor(Math.random() * 20);
+                    }
+                    if (!this.allAnswers.includes(wrongAnswer) && wrongAnswer > 0) {
                         this.allAnswers.push(wrongAnswer);
                     }
                 }
