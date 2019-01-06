@@ -3,33 +3,36 @@
         <p class="alert alert-warning">{{ question }} </p>
         <div class="row">
             <div
-                v-for="select in allAnswers"
-                :key="select"
+                v-for="(select, index) in allAnswers"
+                :key="index"
                 class="col-lg-3"
             >
                 <button class="btn btn-primary" @click.prevent="checkAnswer(select)">{{ select }}</button></div>
             </div>
-        <div>
-            {{ score }}
+        <div class="alert alert-success">
+            Twój wynik {{ score }}
         </div>
-        <div v-show="message.length">
+        <div class="alert alert-danger" v-show="message.length">
             {{ message }}
         </div>
+        <div class="alert alert-primary"><b>{{ to_go }}</b></div>
     </div>
 </template>
 
 <script>
+    const initData = {
+            answer: '',
+            allAnswers: [],
+            question: '',
+            score: 0,
+            message: '',
+            points: 3,
+            to_go: 5
+    };
     export default {
         name: "QuizBase",
         data() {
-            return {
-                answer: '',
-                allAnswers: [],
-                question: '',
-                score: 0,
-                message: '',
-                points: 3
-            }
+            return initData;
         },
         created() {
             this.generateQuestion();
@@ -83,22 +86,23 @@
                 this.question =  first + ' * ' + second + ' ='
             },
             divide() {
-                let first = 0;
-                let second = 0;
-                do {
+                let first =  Math.floor(Math.random() * 200) + 1;
+                let second = Math.floor(Math.random() * 200) + 2;
+                while (first % second !== 0) {
                     first = Math.floor(Math.random() * 200) + 1;
                     second = Math.floor(Math.random() * 200) + 2;
-                    this.answer = first / second;
                 }
-                while ( first % second !== 0 );
+                this.answer = first / second;
                 this.question =  first + ' / ' + second + ' ='
             },
             generateAnswers() {
                 this.allAnswers.push(this.answer);
                 const possibilities = ['+', '-'];
                 this.shuffleArray(possibilities);
+                let wrongAnswer = 0;
+                let counter = 0;
                 while (this.allAnswers.length < 4) {
-                    let wrongAnswer = 0;
+                    if (counter < 30) {
                     switch (possibilities[0]) {
                         case '+':
                             wrongAnswer = this.answer + Math.floor(Math.random() * 20);
@@ -106,10 +110,14 @@
                         case '-':
                             wrongAnswer = this.answer - Math.floor(Math.random() * 20);
                             break;
+                        }
+                    } else {
+                        wrongAnswer = Math.floor(Math.random() * 6)
                     }
                     if (!this.allAnswers.includes(wrongAnswer) && wrongAnswer > 0) {
-                        this.allAnswers.push(wrongAnswer);
+                            this.allAnswers.push(wrongAnswer);
                     }
+                    counter++;
                 }
                 this.shuffleArray(this.allAnswers);
             },
@@ -136,11 +144,20 @@
                 this.allAnswers = [];
                 this.message = '';
                 this.generateQuestion();
+                this.to_go--;
+                if (this.to_go < 0) {
+                    this.gameOver();
+                }
+            },
+            gameOver() {
+                alert('Koniec');
             }
         }
     }
 </script>
 
 <style scoped>
-
+div.alert {
+    margin-top:  15px;
+}
 </style>
