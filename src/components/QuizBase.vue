@@ -14,22 +14,26 @@
             </div>
         </template>
         <template v-if="is_running">
-            <p class="alert alert-warning">{{ question }} </p>
-            <div class="row">
-                <div
-                    v-for="(select, index) in allAnswers"
-                    :key="index"
-                    class="col-lg-3"
-                >
+            <div v-if="!answered">
+                <p class="alert alert-warning">{{ question }} </p>
+                <div class="row">
+                    <div
+                        v-for="(select, index) in allAnswers"
+                        :key="index"
+                        class="col-lg-3"
+                    >
                     <button class="btn btn-primary" @click.prevent="checkAnswer(select)">{{ select }}</button></div>
+                    </div>
+                <div class="alert alert-success">
+                    Twój wynik {{ score }}
                 </div>
-            <div class="alert alert-success">
-                Twój wynik {{ score }}
             </div>
-            <div class="alert alert-danger" v-show="message.length">
-                {{ message }}
+            <div v-else>
+                <div class="alert alert-danger" v-show="message.length">
+                    {{ message }}
+                </div>
+                <div class="alert alert-primary">Pozostało pytań: <b>{{ to_go }}</b></div>
             </div>
-            <div class="alert alert-primary">Pozostało pytań: <b>{{ to_go }}</b></div>
         </template>
     </div>
 </template>
@@ -47,7 +51,8 @@
                 points: 3,
                 to_go: 2,
                 is_running: false,
-                lastResult: 0
+                lastResult: 0,
+                answered: false
             };
         },
         methods: {
@@ -135,6 +140,7 @@
                 this.shuffleArray(this.allAnswers);
             },
             checkAnswer(select) {
+                this.answered = true;
                 if (+select === this.answer) {
                     this.changeQuestion();
                 } else {
