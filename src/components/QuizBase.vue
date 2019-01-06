@@ -1,40 +1,47 @@
 <template>
     <div class="container">
-        <template v-if="!is_running">
-            <div class="alert alert-warning" v-if="lastResult > 0">
-                Twój ostatni wynik: {{lastResult}}
-            </div>
-            <div class="alert alert-primary">
-                <div>
-                    Rozpocząć nową grę?
-                    <button @click="startGame" style="margin-right: 10px" class="btn btn-primary">
-                        Tak
-                    </button>
+        <transition name="fade" appear mode="out-in">
+            <div v-if="!is_running" key="start">
+                <div class="alert alert-warning" v-if="lastResult > 0">
+                    Twój ostatni wynik: {{lastResult}}
                 </div>
-            </div>
-        </template>
-        <template v-if="is_running">
-            <div v-if="!answered">
-                <p class="alert alert-warning">{{ question }} </p>
-                <div class="row">
-                    <div
-                        v-for="(select, index) in allAnswers"
-                        :key="index"
-                        class="col-lg-3"
-                    >
-                    <button class="btn btn-primary" @click.prevent="checkAnswer(select)">{{ select }}</button></div>
+                <div class="alert alert-primary">
+                    <div>
+                        Rozpocząć nową grę?
+                        <button @click="startGame" style="margin-right: 10px" class="btn btn-primary">
+                            Tak
+                        </button>
                     </div>
-                <div class="alert alert-success">
-                    Twój wynik {{ score }}
                 </div>
             </div>
-            <div v-else>
-                <div class="alert alert-danger" v-show="message.length">
-                    {{ message }}
-                </div>
-                <div class="alert alert-primary">Pozostało pytań: <b>{{ to_go }}</b></div>
+            <div v-else key="game">
+                <transition name="fade" appear mode="out-in">
+                    <div v-if="!answered" key="question">
+                        <p class="alert alert-warning">{{ question }} </p>
+                        <div class="row">
+                            <div
+                                v-for="(select, index) in allAnswers"
+                                :key="index"
+                                class="col-lg-3"
+                            >
+                            <button class="btn btn-primary" @click.prevent="checkAnswer(select)">{{ select }}</button></div>
+                            </div>
+                        <div class="alert alert-success">
+                            Twój wynik {{ score }}
+                        </div>
+                    </div>
+                    <div v-else key="messages">
+                        <div class="alert"
+                             v-show="message.length"
+                             :class="correct ? 'alert-success' : 'alert-danger'"
+                        >
+                            {{ message }}
+                        </div>
+                        <div class="alert alert-primary">Pozostało pytań: <b>{{ to_go + 1 }}</b></div>
+                    </div>
+                </transition>
             </div>
-        </template>
+        </transition>
     </div>
 </template>
 
@@ -49,10 +56,11 @@
                 score: 0,
                 message: '',
                 points: 3,
-                to_go: 2,
+                to_go: 3,
                 is_running: false,
                 lastResult: 0,
-                answered: false
+                answered: false,
+                correct: false
             };
         },
         methods: {
@@ -140,16 +148,22 @@
                 this.shuffleArray(this.allAnswers);
             },
             checkAnswer(select) {
-                this.answered = true;
                 if (+select === this.answer) {
+                    this.message = 'Brawo! Poprawna odpowiedź';
+                    this.correct = true;
                     this.changeQuestion();
                 } else {
                     this.points--;
+                    this.correct = false;
+                    this.message = 'Spróbuj jeszcze raz!';
                     if (this.points === 0 ) {
-                        return this.changeQuestion();
+                        this.changeQuestion();
                     }
-                    this.message = 'Spróbuj jeszcze raz!'
                 }
+                this.answered = true;
+                setTimeout(() => {
+                    this.answered = false;
+                },2000);
             },
             shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
@@ -161,11 +175,12 @@
                 this.score += this.points;
                 this.points = 3;
                 this.allAnswers = [];
-                this.message = '';
                 this.generateQuestion();
                 this.to_go--;
                 if (this.to_go < 0) {
-                    this.gameOver();
+                    setTimeout(() => {
+                        this.gameOver();
+                    },2000);
                 }
             },
             gameOver() {
@@ -174,7 +189,6 @@
                 this.answer = '';
                 this.allAnswers = [];
                 this.score = 0;
-                this.message = '';
                 this.to_go = 2;
             },
             startGame() {
