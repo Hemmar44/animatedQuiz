@@ -1,41 +1,57 @@
 <template>
     <div class="container">
-        <p class="alert alert-warning">{{ question }} </p>
-        <div class="row">
-            <div
-                v-for="(select, index) in allAnswers"
-                :key="index"
-                class="col-lg-3"
-            >
-                <button class="btn btn-primary" @click.prevent="checkAnswer(select)">{{ select }}</button></div>
+        <template v-if="!is_running">
+            <div class="alert alert-warning" v-if="lastResult > 0">
+                Twój ostatni wynik: {{lastResult}}
             </div>
-        <div class="alert alert-success">
-            Twój wynik {{ score }}
-        </div>
-        <div class="alert alert-danger" v-show="message.length">
-            {{ message }}
-        </div>
-        <div class="alert alert-primary"><b>{{ to_go }}</b></div>
+            <div class="alert alert-primary">
+                <div>
+                    Rozpocząć grę?
+                    <button @click="startGame" style="margin-right: 10px" class="btn btn-primary">
+                        Tak
+                    </button>
+                    <button class="btn btn-warning">
+                        Nie
+                    </button>
+                </div>
+            </div>
+        </template>
+        <template v-if="is_running">
+            <p class="alert alert-warning">{{ question }} </p>
+            <div class="row">
+                <div
+                    v-for="(select, index) in allAnswers"
+                    :key="index"
+                    class="col-lg-3"
+                >
+                    <button class="btn btn-primary" @click.prevent="checkAnswer(select)">{{ select }}</button></div>
+                </div>
+            <div class="alert alert-success">
+                Twój wynik {{ score }}
+            </div>
+            <div class="alert alert-danger" v-show="message.length">
+                {{ message }}
+            </div>
+            <div class="alert alert-primary">Pozostało pytań: <b>{{ to_go }}</b></div>
+        </template>
     </div>
 </template>
 
 <script>
-    const initData = {
-            answer: '',
-            allAnswers: [],
-            question: '',
-            score: 0,
-            message: '',
-            points: 3,
-            to_go: 5
-    };
     export default {
         name: "QuizBase",
         data() {
-            return initData;
-        },
-        created() {
-            this.generateQuestion();
+            return {
+                answer: '',
+                allAnswers: [],
+                question: '',
+                score: 0,
+                message: '',
+                points: 3,
+                to_go: 2,
+                is_running: false,
+                lastResult: 0
+            };
         },
         methods: {
             generateQuestion() {
@@ -150,7 +166,17 @@
                 }
             },
             gameOver() {
-                alert('Koniec');
+                this.lastResult = this.score;
+                this.is_running = false;
+                this.answer = '';
+                this.allAnswers = [];
+                this.score = 0;
+                this.message = '';
+                this.to_go = 2;
+            },
+            startGame() {
+                this.is_running = true;
+                this.generateQuestion();
             }
         }
     }
