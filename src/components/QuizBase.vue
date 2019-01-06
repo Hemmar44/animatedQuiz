@@ -6,12 +6,9 @@
             </div>
             <div class="alert alert-primary">
                 <div>
-                    Rozpocząć grę?
+                    Rozpocząć nową grę?
                     <button @click="startGame" style="margin-right: 10px" class="btn btn-primary">
                         Tak
-                    </button>
-                    <button class="btn btn-warning">
-                        Nie
                     </button>
                 </div>
             </div>
