@@ -105,6 +105,7 @@
                             break;
                         case '-':
                             wrongAnswer = this.answer - Math.floor(Math.random() * 20);
+                            break;
                     }
                     if (!this.allAnswers.includes(wrongAnswer) && wrongAnswer > 0) {
                         this.allAnswers.push(wrongAnswer);
